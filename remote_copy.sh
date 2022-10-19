@@ -11,7 +11,8 @@ deployPath=$3
 account=$4
 # 当前发布好的iotdb所在的目录
 localSoftPath=$5
-remoteSoftPath=$deployPath
+# 添加一个默认路劲，防止路径错误导致系统文件被删除
+remoteSoftPath=$deployPath/iotdb
 function closeServer(){
   key=$1
   ip=$2
@@ -30,7 +31,7 @@ for ip in ${confignodeIps[@]};do
   # 删除已有的iotdb目录文件
   ssh ${account}@${ip} "rm -rf ${remoteSoftPath} > /dev/null 2>&1 &"
   # 复制新的iotdb到目录中
-  scp -r ${localSoftPath} ${account}@${ip}:${remoteSoftPath}
+  scp -rq ${localSoftPath} ${account}@${ip}:${remoteSoftPath}
   ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/confignode/logs > /dev/null 2>&1 &"
   ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/confignode/data > /dev/null 2>&1 &"
   # echo "configNode已经复制到"${deployPath}"中,"当前的目录结构为$dir
@@ -43,7 +44,7 @@ for ip in ${datanodeIps[@]};do
   # 删除已有的iotdb目录文件
   ssh ${account}@${ip} "rm -rf ${remoteSoftPath} "
   # 复制新的iotdb到目录中
-  scp -r ${localSoftPath} ${account}@${ip}:${remoteSoftPath}
+  scp -rq ${localSoftPath} ${account}@${ip}:${remoteSoftPath}
   ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/datanode/logs > /dev/null 2>&1 &"
   ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/datanode/data > /dev/null 2>&1 &"
 done

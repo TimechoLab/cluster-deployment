@@ -1,6 +1,6 @@
 #!/bin/bash
 function validateParam() {
-  echo "初始化参数为 branch_name:"$1 "commit_id:"$2 "confignode_ips:"$3 "datanode_ips:"$4 "deploy_path:"$5 "server_account:"$6 "iotdb_path:"$7
+  echo "初始化参数为 branch_name:"$1 "commit_id:"$2 "confignode_ips:"$3 "datanode_ips:"$4 "deploy_path:"$5 "server_account:"$6 "iotdb_git_path:"$7
   if [ -z $1 ] && [ -z $2 ]; then
     echo "branch_name和commit_id必须其中一个参数不为空"
     exit
@@ -19,7 +19,7 @@ function validateParam() {
     exit
   elif [ -z $7 ]; then
     echo $7
-    echo "参数iotdb_path不能为空"
+    echo "参数iotdb_git_path不能为空"
     exit
   fi
 }
@@ -42,7 +42,7 @@ for line in $(cat config.ini | sed '/^$/d'); do
   fi
 done
 # 进行参数验证
-validateParam "${initParams[branch_name]}" "${initParams[commit_id]}" ${initParams[confignode_ips]} ${initParams[datanode_ips]} ${initParams[deploy_path]} ${initParams[server_account]} ${initParams[iotdb_path]}
+validateParam "${initParams[branch_name]}" "${initParams[commit_id]}" ${initParams[confignode_ips]} ${initParams[datanode_ips]} ${initParams[deploy_path]} ${initParams[server_account]} ${initParams[iotdb_git_path]}
 # confignode的ip list
 confignodeIpsStr=${initParams[confignode_ips]}
 confignodeIps=(${confignodeIpsStr//,/ })
@@ -53,8 +53,23 @@ datanodeIps=(${datanodeIpsStr//,/ })
 deployPath=${initParams[deploy_path]}
 # 服务器的用户名
 userNameOfServer=${initParams[server_account]}
+# echo "开始部署项目 ..."
+# # 解决当为空字符串时，直接传递参数丢失的问题
+# if [ -z $branchName ];then
+#  result=`bash compiler_deploy.sh "" $commitId ${initParams[iotdb_git_path]}`
+#  exit_evl $result
+# else
+#  result=`bash compiler_deploy.sh $branchName "" ${initParams[iotdb_git_path]}`
+#  exit_evl $result
+# fi
+# echo "部署项目结束 ..."
+iotdbPath=""
 # iotdb工程所在的目录
-iotdbPath=${initParams[iotdb_path]}
+if [ ! -n ${initParams[iotdb_deploy_path]} ];then
+  iotdbPath=${initParams[iotdb_deploy_path]}
+else
+  iotdbPath=${initParams[iotdb_git_path]}/distribution/target/apache-iotdb-*-all-bin/apache-iotdb-*-all-bin/
+fi
 echo "开始复制项目到服务器 ..."
 bash remote_copy.sh $confignodeIpsStr $datanodeIpsStr $deployPath $userNameOfServer $iotdbPath
 echo "项目复制到服务器结束 ..."

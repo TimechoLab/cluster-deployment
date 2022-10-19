@@ -71,7 +71,9 @@ deploy_path=/root/temp
 # ConfigNode和DataNode服务器的用户名，注意多个服务器用户名需要一致
 server_account=root
 # IoTDB Git仓库地址
-iotdb_path=/f/workspace/iotdb
+iotdb_git_path=/home/mltest/iotdb
+# 发布好的iotdb包所在的位置，如果没有配置则默认为$iotdb_git_path/distribution/target/apache-iotdb-*-all-bin/apache-iotdb-*-all-bin/
+iotdb_deploy_path=/home/mltest/zhy_test/
 ```
 
 ### 2.2 脚本使用
@@ -88,7 +90,8 @@ confignode_ips，ConfigNode的ip列表
 datanode_ips，DataNode的ip列表  
 deploy_path，发布到服务器上的地址路径，注意实际路径为 `$deploy_path/iotdb`  
 server_account，服务器的用户名  
-iotdb_path，数据库所在Git仓库的路径  
+iotdb_git_path，iotdb所在Git仓库的路径 
+iotdb_deploy_path,iotdb发布好的包所在的路径，如果没有配置则默认为$iotdb_git_path/distribution/target/apache-iotdb-*-all-bin/apache-iotdb-*-all-bin/
 
 **脚本替换变量说明**  
 脚本会替换config.ini中配置的变量  
