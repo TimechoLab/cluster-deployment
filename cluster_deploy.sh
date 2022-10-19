@@ -65,7 +65,7 @@ userNameOfServer=${initParams[server_account]}
 # echo "部署项目结束 ..."
 iotdbPath=""
 # iotdb工程所在的目录
-if [ ! -n ${initParams[iotdb_deploy_path]} ];then
+if [ ! -z ${initParams[iotdb_deploy_path]} ];then
   iotdbPath=${initParams[iotdb_deploy_path]}
 else
   iotdbPath=${initParams[iotdb_git_path]}/distribution/target/apache-iotdb-*-all-bin/apache-iotdb-*-all-bin/
