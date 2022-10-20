@@ -81,7 +81,7 @@ iotdb_deploy_path=/home/mltest/zhy_test/
 > 默认会依次调用`compiler_deploy.sh`脚本，`remote_copy.sh`脚本，`replace_start.sh`脚本进行部署工作
 
 示例:  
-`sh cluster_deploy.sh`    
+`bash cluster_deploy.sh`    
 **脚本初始化参数配置:**   
 需要在`config.ini`配置文件的`[deployment]`模块下配置如下的参数    
 branch_name,分支的名字,与commit_id二选一    
@@ -105,7 +105,7 @@ iotdb-datanode.properties中target_config_nodes为confignode_ips中配置的所�
 ### 2.3 `compiler_deploy.sh`脚本的使用  
 
 示例：    
-`sh compiler_deploy.sh "master" "" /f/workspace1/iotdb`  
+`bash compiler_deploy.sh "master" "" /f/workspace1/iotdb`  
 **参数介绍:**    
 参数1,分支的名字,与参数2二选一  
 参数2，commitid，与参数1二选一  
@@ -114,26 +114,41 @@ iotdb-datanode.properties中target_config_nodes为confignode_ips中配置的所�
 ### 2.4 `remote_copy.sh`脚本的使用  
 
 示例：    
-`sh remote_copy.sh 192.168.1.222,192.168.1.174,192.168.1.218 192.168.1.222,192.168.1.174,192.168.1.218 /root/temp root /f/workspace1/iotdb`  
+`bash remote_copy.sh 192.168.1.222,192.168.1.174,192.168.1.218 192.168.1.222,192.168.1.174,192.168.1.218 /root/temp root /f/workspace1/iotdb`  
 **参数介绍:**    
 参数1，ConfigNode的ip列表  
 参数2，DataNode的ip列表  
 参数3，发布到服务器上的地址路径，注意实际路径为 `参数5/iotdb`  
 参数4，服务器的用户名  
-参数5，控制机iotdb git工程所在的路径  
+参数5，控制机中Iotdb包所在的路径  
 
 ### 2.5 `replace_start.sh`脚本的使用 
 
 示例：    
-`sh replace_start.sh 192.168.1.222,192.168.1.174,192.168.1.218 192.168.1.222,192.168.1.174,192.168.1.218 /root/temp root`  
+`bash replace_start.sh 192.168.1.222,192.168.1.174,192.168.1.218 192.168.1.222,192.168.1.174,192.168.1.218 /root/temp root`  
 **参数介绍:**    
 参数1，ConfigNode的ip列表  
 参数2，DataNode的ip列表  
 参数3，发布到服务器上的地址路径，注意实际路径为 `参数5/iotdb`  
 参数4，服务器的用户名  
+
+### 2.6 `stop_all.sh` 脚本的使用
+示例: `bash stop_all.sh`  
+**脚本说明**  
+1. 脚本会从config.ini配置文件的`deployment` 模块中获取`confignode_ips`,`datanode_ips`,`deploy_path`,`server_account`中配置的4个参数
+2. 脚本会默认执行`confignode_ips`,`datanode_ips`机器的$deploy_path/iotdb/xxnode/sbin/stop_xxnode.sh的停止脚本，停止服务。其中`xx`代表ConfigNode或DataNode的脚本
+
+### 2.7 `start_all.sh` 脚本的使用
+示例: `bash start_all.sh`  
+**脚本说明**  
+1. 脚本会从config.ini配置文件的`deployment` 模块中获取`confignode_ips`,`datanode_ips`,`deploy_path`,`server_account`中配置的4个参数
+2. 脚本会默认执行`confignode_ips`,`datanode_ips`机器的$deploy_path/iotdb/xxnode/sbin/start_xxnode.sh的停止脚本，停止服务。其中`xx`代表ConfigNode或DataNode的脚本。
 
 ## 脚本使用前置
 1. 控制机(脚本运行的机器)需要和各集群的集群配置ssh免密登录
 2. 控制机需要配置好jdk（版本为1.8及以上），git,maven
 3. 集由群机器需要配置好jdk,注意于脚本使用的是ssh方式进行远程服务启动，所以需要在集群的部署用户目录的~/.bashrc中添加jdk的变量(添加到文件的第二行)，否则脚本运行jdk相关的指令不成功。
+
+
+
 
