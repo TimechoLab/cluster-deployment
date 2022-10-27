@@ -77,7 +77,7 @@ for ip in ${confignodeIps[@]};do
     configNodeCheckNum=$(($configNodeCheckNum+$?))
 done
 #启动datanode服务
-datanodeStopShell=$deployPath/iotdb/datanode/sbin/start-datanode.sh
+datanodeStopShell=$deployPath/iotdb/sbin/start-datanode.sh
 for ip in ${datanodeIps[@]};do
     echo "开始启动$ip的DataNode"
     ssh ${account}@${ip} "bash $datanodeStopShell  > /dev/null 2>&1 &"
