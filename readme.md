@@ -23,8 +23,12 @@
 对应`DataNode服务器``iotdb-datanode.properties`配置文件中的配置，为任意值。  
 特别注意的是，如果存在以`^$key`开头的配置，则使用配置替换，如果不存在，则首先会匹配`^ #$key`,如果有则会在对应行下新增配置，否则会在最后一行新增配置。  
 
-**iotdb-metric.yml模块**  
-对应`DataNode``ConfigNode`中iotdb-metric.yml配置文件的配置，使用`^$key`进行匹配  
+**iotdb-datanode-metric.yml模块**  
+对应`DataNode`中iotdb-datanode-metric.yml配置文件的配置，使用`^$key`进行匹配
+
+**iotdb-confignode-metric.yml模块**  
+对应`ConfigNode`中iotdb-confignode-metric.yml配置文件的配置，使用`^$key`进行匹配
+
 
 **confignode-env.sh模块**  
 对应`ConfigNode`服务器`confignode-env.sh`配置文件中的配置，为固定值，目前只支持`MAX_HEAP_SIZE`,`HEAP_NEWSIZE`,`MAX_DIRECT_MEMORY_SIZE`3个参数  
@@ -46,8 +50,12 @@ MAX_DIRECT_MEMORY_SIZE=\"3G\"
 [iotdb-datanode.properties]
 primitive_array_size=16
 write_read_schema_free_memory_proportion=4:2:2:2
-[iotdb-metric.yml]
-prometheusExporterPort=907
+[iotdb-confignode-metric.yml]
+enableMetric=true
+prometheusExporterPort=9001
+[iotdb-datanode-metric.yml]
+enableMetric=true
+prometheusExporterPort=9003
 [confignode-env.sh]
 #本配置只支持这三个参数的修改
 MAX_HEAP_SIZE=\"3G\"

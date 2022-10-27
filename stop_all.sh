@@ -44,7 +44,7 @@ function validateParam() {
 }
 validateParam $confignodeIpsStr $datanodeIpsStr $deployPath $account
 #停止datanode服务
-datanodeStopShell=$deployPath/iotdb/datanode/sbin/stop-datanode.sh
+datanodeStopShell=$deployPath/iotdb/sbin/stop-datanode.sh
 retry=0
 function checkStatus(){
   key=$1

@@ -69,7 +69,7 @@ function checkStatus(){
 }
 configNodeCheckNum=0
 # 启动confignode服务
-confignodeStopShell=$deployPath/iotdb/confignode/sbin/start-confignode.sh
+confignodeStopShell=$deployPath/iotdb/sbin/start-confignode.sh
 for ip in ${confignodeIps[@]};do
     echo "开始启动$ip的ConfigNode"
     ssh ${account}@${ip} "bash $confignodeStopShell > /dev/null 2>&1 &"

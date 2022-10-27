@@ -12,13 +12,14 @@ currentFile=""
 # iotdb所在的根目录
 softBaseDir=$deployPath/iotdb
 # confignode配置文件的根目录
-confignodeBaseDir=$softBaseDir/confignode
+confignodeBaseDir=$softBaseDir
 # datanode配置文件的根目录
-datanodeBaseDir=$softBaseDir/datanode
+datanodeBaseDir=$softBaseDir
 confignodePort=22277
 declare -A datanodeEnvMap
 declare -A iotdbDatanodeMap
-declare -A iotdbMetricMap
+declare -A iotdbConfignodeMetricMap
+declare -A iotdbDatanodeMetricMap
 declare -A confignodeEnvMap
 declare -A iotdbConfignodeMap
 for line in $(cat config.ini | sed '/^$/d'); do
@@ -37,8 +38,10 @@ for line in $(cat config.ini | sed '/^$/d'); do
       datanodeEnvMap[$key]=$value
     elif [[ $currentFile == iotdb-datanode.properties ]]; then
       iotdbDatanodeMap[$key]=$value
-    elif [[ $currentFile == iotdb-metric.yml ]]; then
-      iotdbMetricMap[$key]=$value
+    elif [[ $currentFile == iotdb-confignode-metric.yml ]]; then
+      iotdbConfignodeMetricMap[$key]=$value
+    elif [[ $currentFile == iotdb-datanode-metric.yml ]]; then
+      iotdbDatanodeMetricMap[$key]=$value
     elif [[ $currentFile == confignode-env.sh ]]; then
       confignodeEnvMap[$key]=$value
     elif [[ $currentFile == iotdb-confignode.properties ]]; then
@@ -48,8 +51,8 @@ for line in $(cat config.ini | sed '/^$/d'); do
 done
 # 替换和ip地址相关的配置
 for ip in ${confignodeIps[@]}; do
-  ssh ${account}@${ip} "sed -i \"s/^internal_address.*$/internal_address=${ip}/g\" ${confignodeBaseDir}/conf/iotdb-confignode.properties"
-  ssh ${account}@${ip} "sed -i \"s/^target_config_nodes.*$/target_config_nodes=${confignodeIps[0]}:${confignodePort}/g\" ${confignodeBaseDir}/conf/iotdb-confignode.properties"
+  ssh ${account}@${ip} "sed -i 's/^internal_address.*$/internal_address=${ip}/g' ${confignodeBaseDir}/conf/iotdb-confignode.properties"
+  ssh ${account}@${ip} "sed -i 's/^target_config_nodes.*$/target_config_nodes=${confignodeIps[0]}:${confignodePort}/g' ${confignodeBaseDir}/conf/iotdb-confignode.properties"
 done
 # 数组的长度
 len=${#confignodeIps[*]}
@@ -63,9 +66,9 @@ done
 str=${tempD[*]}
 configNodeIpsStr=${str// /,}
 for ip in ${datanodeIps[@]}; do
-  ssh ${account}@${ip} "sed -i \"s/^internal_address.*$/internal_address=${ip}/g\" ${datanodeBaseDir}/conf/iotdb-datanode.properties"
-  ssh ${account}@${ip} "sed -i \"s/^rpc_address.*$/rpc_address=${ip}/g\" ${datanodeBaseDir}/conf/iotdb-datanode.properties"
-  ssh ${account}@${ip} "sed -i \"s/^target_config_nodes.*$/target_config_nodes=${configNodeIpsStr}/g\" ${datanodeBaseDir}/conf/iotdb-datanode.properties"
+  ssh ${account}@${ip} "sed -i 's/^internal_address.*$/internal_address=${ip}/g' ${datanodeBaseDir}/conf/iotdb-datanode.properties"
+  ssh ${account}@${ip} "sed -i 's/^rpc_address.*$/rpc_address=${ip}/g' ${datanodeBaseDir}/conf/iotdb-datanode.properties"
+  ssh ${account}@${ip} "sed -i 's/^target_config_nodes.*$/target_config_nodes=${configNodeIpsStr}/g' ${datanodeBaseDir}/conf/iotdb-datanode.properties"
 done
 function replaceParam(){
   key=$1
@@ -88,17 +91,17 @@ function replaceParam(){
 # 替换confignode中的配置
 echo "开始替换confignode的配置 ..."
 for ip in ${confignodeIps[@]}; do
-  for key in ${!iotdbMetricMap[@]}; do
-    ssh ${account}@${ip} "sed -i \"s/^${key}.*$/${key}: ${iotdbMetricMap[$key]}/g\" ${confignodeBaseDir}/conf/iotdb-metric.yml"
-    ssh ${account}@${ip} "sed -i \"s/^prometheusExporterPort.*$/prometheusExporterPort: 9091/g\" ${confignodeBaseDir}/conf/iotdb-metric.yml"
+  for key in ${!iotdbConfignodeMetricMap[@]}; do
+    ssh ${account}@${ip} "sed -i 's/^${key}.*$/${key}: ${iotdbConfignodeMetricMap[$key]}/g' ${confignodeBaseDir}/conf/iotdb-confignode-metric.yml"
+    # ssh ${account}@${ip} "sed -i \"s/^prometheusExporterPort.*$/prometheusExporterPort: 9091/g\" ${confignodeBaseDir}/conf/iotdb-confignode-metric.yml"
   done
   for key in ${!confignodeEnvMap[@]}; do
     if [[ $key == MAX_HEAP_SIZE ]]; then
-      ssh ${account}@${ip} "sed -i \"s/^#MAX_HEAP_SIZE=\\\"2G\\\".*$/${key}=${confignodeEnvMap[$key]}/g\" ${confignodeBaseDir}/conf/confignode-env.sh"
+      ssh ${account}@${ip} "sed -i 's/^#MAX_HEAP_SIZE=\\\"2G\\\".*$/${key}=${confignodeEnvMap[$key]}/g' ${confignodeBaseDir}/conf/confignode-env.sh"
     elif [[ $key == HEAP_NEWSIZE ]]; then
-      ssh ${account}@${ip} "sed -i \"s/^#HEAP_NEWSIZE=\\\"2G\\\".*$/${key}=${confignodeEnvMap[$key]}/g\" ${confignodeBaseDir}/conf/confignode-env.sh"
+      ssh ${account}@${ip} "sed -i 's/^#HEAP_NEWSIZE=\\\"2G\\\".*$/${key}=${confignodeEnvMap[$key]}/g' ${confignodeBaseDir}/conf/confignode-env.sh"
     else
-      ssh ${account}@${ip} "sed -i \"s/^${key}.*$/${key}=${confignodeEnvMap[$key]}/g\" ${confignodeBaseDir}/conf/confignode-env.sh"
+      ssh ${account}@${ip} "sed -i 's/^${key}.*$/${key}=${confignodeEnvMap[$key]}/g' ${confignodeBaseDir}/conf/confignode-env.sh"
     fi
   done
   for key in ${!iotdbConfignodeMap[@]}; do
@@ -111,24 +114,61 @@ echo "开始替换datanode的配置 ..."
 for ip in ${datanodeIps[@]}; do
   for key in ${!datanodeEnvMap[@]}; do
     if [ $key == MAX_HEAP_SIZE ]; then
-      ssh ${account}@${ip} "sed -i \"s/^#MAX_HEAP_SIZE=\\\"2G\\\".*$/${key}=${datanodeEnvMap[$key]}/g\" ${datanodeBaseDir}/conf/datanode-env.sh"
+      ssh ${account}@${ip} "sed -i 's/^#MAX_HEAP_SIZE=\\\"2G\\\".*$/${key}=${datanodeEnvMap[$key]}/g' ${datanodeBaseDir}/conf/datanode-env.sh"
     elif [ $key == HEAP_NEWSIZE ]; then
-      ssh ${account}@${ip} "sed -i \"s/^#HEAP_NEWSIZE=\\\"2G\\\".*$/${key}=${datanodeEnvMap[$key]}/g\" ${datanodeBaseDir}/conf/datanode-env.sh"
+      ssh ${account}@${ip} "sed -i 's/^#HEAP_NEWSIZE=\\\"2G\\\".*$/${key}=${datanodeEnvMap[$key]}/g' ${datanodeBaseDir}/conf/datanode-env.sh"
     else
-      ssh ${account}@${ip} "sed -i \"s/^${key}.*$/${key}=${datanodeEnvMap[$key]}/g\" ${datanodeBaseDir}/conf/datanode-env.sh"
+      ssh ${account}@${ip} "sed -i 's/^${key}.*$/${key}=${datanodeEnvMap[$key]}/g' ${datanodeBaseDir}/conf/datanode-env.sh"
     fi
   done
   for key in ${!iotdbDatanodeMap[@]}; do
     replaceParam $key ${iotdbDatanodeMap[$key]} ${datanodeBaseDir}/conf/iotdb-datanode.properties
     # ssh ${account}@${ip} "sed -i \"s/^${key}.*$/${key}=${iotdbDatanodeMap[$key]}/g\" ${datanodeBaseDir}/conf/iotdb-datanode.properties"
   done
-  for key in ${!iotdbMetricMap[@]}; do
-    ssh ${account}@${ip} "sed -i \"s/^${key}.*$/${key}: ${iotdbMetricMap[$key]}/g\" ${datanodeBaseDir}/conf/iotdb-metric.yml"
-    ssh ${account}@${ip} "sed -i \"s/^prometheusExporterPort:.*$/prometheusExporterPort: 9093/g\" ${datanodeBaseDir}/conf/iotdb-metric.yml"
+  for key in ${!iotdbDatanodeMetricMap[@]}; do
+    ssh ${account}@${ip} "sed -i 's/^${key}.*$/${key}: ${iotdbDatanodeMetricMap[$key]}/g' ${datanodeBaseDir}/conf/iotdb-datanode-metric.yml"
+    # ssh ${account}@${ip} "sed -i \"s/^prometheusExporterPort:.*$/prometheusExporterPort: 9093/g\" ${datanodeBaseDir}/conf/iotdb-datanode-metric.yml"
   done
 done
 echo ”datanode的配置更新完成 ...“
 echo "集群配置已经更新完成 ... "
+echo "-------------输出替换脚本的变量内容开始-------------"
+for ip in ${confignodeIps[@]}; do
+  echo "开始输出ConfigNode[$ip]的配置..."
+  echo "${confignodeBaseDir}/conf/iotdb-confignode-metric.yml 中的配置"
+  for key in ${!iotdbConfignodeMetricMap[@]}; do
+    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode-metric.yml | grep ^$key"
+  done
+  echo "${confignodeBaseDir}/conf/confignode-env.sh 中的配置"
+  for key in ${!confignodeEnvMap[@]}; do
+    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/confignode-env.sh | grep ^$key"
+  done
+  echo "${confignodeBaseDir}/conf/iotdb-confignode.properties 中的配置"
+  for key in ${!iotdbConfignodeMap[@]}; do
+    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^$key"
+  done
+  ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^internal_address"
+  ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^target_config_nodes"
+done
+for ip in ${datanodeIps[@]}; do
+  echo "开始输出DataNode[$ip]的配置..."
+  echo "${datanodeBaseDir}/conf/iotdb-datanode-metric.yml 中的配置"
+  for key in ${!iotdbDatanodeMetricMap[@]}; do
+    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode-metric.yml | grep ^$key"
+  done
+  echo "${datanodeBaseDir}/conf/datanode-env.sh 中的配置"
+  for key in ${!datanodeEnvMap[@]}; do
+    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/datanode-env.sh | grep ^$key"
+  done
+  echo "${datanodeBaseDir}/conf/iotdb-datanode.properties 中的配置"
+  for key in ${iotdbDatanodeMap[@]}; do
+    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^$key"
+  done
+  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^internal_address"
+  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^rpc_address"
+  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^target_config_nodes"
+done
+echo "-------------输出替换脚本的变量内容结束-------------"
 # 启动集群
 function closeServer(){
   key=$1
@@ -195,43 +235,7 @@ for ip in ${datanodeIps[@]};do
   done
 done
 echo "datanode启动完成"
-echo "-------------输出替换脚本的变量内容开始-------------"
-for ip in ${confignodeIps[@]}; do
-  echo "开始输出ConfigNode[$ip]的配置..."
-  echo "${confignodeBaseDir}/conf/iotdb-metric.yml 中的配置"
-  for key in ${!iotdbMetricMap[@]}; do
-    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-metric.yml | grep ^$key"
-  done
-  echo "${confignodeBaseDir}/conf/confignode-env.sh 中的配置"
-  for key in ${!confignodeEnvMap[@]}; do
-    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/confignode-env.sh | grep ^$key"
-  done
-  echo "${confignodeBaseDir}/conf/iotdb-confignode.properties 中的配置"
-  for key in ${!iotdbConfignodeMap[@]}; do
-    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^$key"
-  done
-  ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^internal_address"
-  ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^target_config_nodes"
-done
-for ip in ${datanodeIps[@]}; do
-  echo "开始输出DataNode[$ip]的配置..."
-  echo "${datanodeBaseDir}/conf/iotdb-metric.yml 中的配置"
-  for key in ${!iotdbMetricMap[@]}; do
-    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-metric.yml | grep ^$key"
-  done
-  echo "${datanodeBaseDir}/conf/datanode-env.sh 中的配置"
-  for key in ${!datanodeEnvMap[@]}; do
-    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/datanode-env.sh | grep ^$key"
-  done
-  echo "${datanodeBaseDir}/conf/iotdb-datanode.properties 中的配置"
-  for key in ${iotdbDatanodeMap[@]}; do
-    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^$key"
-  done
-  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^internal_address"
-  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^rpc_address"
-  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^target_config_nodes"
-done
-echo "-------------输出替换脚本的变量内容结束-------------"
+
 #根据检查结果进行下一步操作
 if [ "$check_config_num" == "${#confignodeIps[*]}" ] && [ "$check_data_num" == "${#datanodeIps[*]}" ]; then
   echo "全部集群已启动"
