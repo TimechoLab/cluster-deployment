@@ -56,8 +56,8 @@ userNameOfServer=${initParams[server_account]}
 # echo "开始部署项目 ..."
 #result=`bash compiler_deploy.sh "${initParams[branch_name]}" "${initParams[commit_id]}" ${initParams[iotdb_git_path]}`
 #exit_evl $result
-
 # iotdb工程所在的目录
+iotdbPath=""
 if [ ! -z ${initParams[iotdb_deploy_path]} ];then
   iotdbPath=${initParams[iotdb_deploy_path]}
 else
