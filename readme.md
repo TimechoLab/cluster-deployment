@@ -21,7 +21,7 @@
 
 **iotdb-datanode.properties模块**  
 对应`DataNode服务器``iotdb-datanode.properties`配置文件中的配置，为任意值。  
-特别注意的是，如果存在以`^$key`开头的配置，则使用配置替换，如果不存在，则首先会匹配`^ #$key`,如果有则会在对应行下新增配置，否则会在最后一行新增配置。  
+特别注意的是，如果存在以`^$key`开头的配置，则使用配置替换，如果不存在，则首先会匹配`^ #$key`,会在最后一行新增配置。  
 
 **iotdb-datanode-metric.yml模块**  
 对应`DataNode`中iotdb-datanode-metric.yml配置文件的配置，使用`^$key`进行匹配
@@ -35,7 +35,11 @@
 
 **iotdb-confignode.properties模块**  
 对应`ConfigNode服务器``iotdb-confignode.properties`配置文件中的配置，为任意值。  
-特别注意的是，如果存在以`^$key`开头的配置，则使用配置替换，如果不存在，则首先会匹配`^ #$key`,如果有则会在对应行下新增配置，否则会在最后一行新增配置。  
+特别注意的是，如果存在以`^$key`开头的配置，则使用配置替换，如果不存在，则首先会匹配`^ #$key`,会在最后一行新增配置。  
+
+**iotdb-common.properties模块**  
+对应`ConfigNode服务器/DataNode服务器``iotdb-common.properties`配置文件中的配置，为任意值。  
+特别注意的是，如果存在以`^$key`开头的配置，则使用配置替换，如果不存在，则首先会匹配`^ #$key`,会在最后一行新增配置。
 
 **deployment模块**  
 该模块中主要配置和脚本启动参数相关的变量。  
@@ -44,40 +48,42 @@
 ```sh
 #注意值如果值需要加",需要使用\"进行转义，如MAX_HEAP_SIZE=\"3G\"
 [datanode-env.sh]
-MAX_HEAP_SIZE=\"3G\"
-HEAP_NEWSIZE=\"2G\"
-MAX_DIRECT_MEMORY_SIZE=\"3G\"
+MAX_HEAP_SIZE=\"12G\"
+#HEAP_NEWSIZE=\"2G\"
+#MAX_DIRECT_MEMORY_SIZE=\"3G\"
+[confignode-env.sh]
+#本配置只支持这两个参数的修改
+MAX_HEAP_SIZE=\"8G\"
+#HEAP_NEWSIZE=\"2G\"
+#MAX_DIRECT_MEMORY_SIZE=\"3G\"
 [iotdb-datanode.properties]
-primitive_array_size=16
-write_read_schema_free_memory_proportion=4:2:2:2
+#dn_system_dir=data\/datanode\/system
+[iotdb-common.properties]
+data_region_consensus_protocol_class=org.apache.iotdb.consensus.multileader.MultiLeaderConsensus
+#schema_region_consensus_protocol_class=\"org.apache.iotdb.consensus.ratis.RatisConsensus\"
+#schema_replication_factor=1
+data_replication_factor=3
 [iotdb-confignode-metric.yml]
 enableMetric=true
 prometheusExporterPort=9001
 [iotdb-datanode-metric.yml]
 enableMetric=true
 prometheusExporterPort=9003
-[confignode-env.sh]
-#本配置只支持这三个参数的修改
-MAX_HEAP_SIZE=\"3G\"
-HEAP_NEWSIZE=\"2G\"
-MAX_DIRECT_MEMORY_SIZE=\"3G\"
 [iotdb-confignode.properties]
-schema_replication_factor=1
-data_replication_factor=1
-schema_region_consensus_protocol_class=org.apache.iotdb.consensus.ratis.RatisConsensus
+#cn_system_dir=data\/confignode\/system
 [deployment]
-# 分支名,和commit_id二选一
+#分支名,和commit_id二选一
 branch_name=master
 # git提交记录的commitId，和branch_name二选一
 # commit_id=
 # ConfigNode服务器的ip，多个以,号进行连接
-confignode_ips=192.168.1.222,192.168.1.174,192.168.1.218
+confignode_ips=192.168.130.16
 # DataNode服务器的ip，多个以,号进行连接
-datanode_ips=192.168.1.222,192.168.1.174,192.168.1.218
+datanode_ips=192.168.130.16,192.168.130.17,192.168.130.18
 # 发布到服务器上的地址
-deploy_path=/root/temp
+deploy_path=/data1/mltest
 # ConfigNode和DataNode服务器的用户名，注意多个服务器用户名需要一致
-server_account=root
+server_account=mltest
 # IoTDB Git仓库地址
 iotdb_git_path=/home/mltest/iotdb
 # 发布好的iotdb包所在的位置，如果没有配置则默认为$iotdb_git_path/distribution/target/apache-iotdb-*-all-bin/apache-iotdb-*-all-bin/
