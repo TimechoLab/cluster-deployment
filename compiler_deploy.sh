@@ -9,7 +9,7 @@ iotdbPath=$3
 # fi
 # git项目所在路径
 IOTDB_PATH=$iotdbPath
-echo ”输入参数:“branchName:$branchName commitId:$commitId IOTDB_PATH:$IOTDB_PATH
+echo "输入参数:"branchName:$branchName commitId:$commitId IOTDB_PATH:$IOTDB_PATH
 #保存原始目录
 originDir=`pwd`
 # 切换到项目目录

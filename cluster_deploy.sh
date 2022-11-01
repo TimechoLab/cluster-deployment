@@ -54,17 +54,10 @@ deployPath=${initParams[deploy_path]}
 # 服务器的用户名
 userNameOfServer=${initParams[server_account]}
 # echo "开始部署项目 ..."
-# # 解决当为空字符串时，直接传递参数丢失的问题
-# if [ -z $branchName ];then
-#  result=`bash compiler_deploy.sh "" $commitId ${initParams[iotdb_git_path]}`
-#  exit_evl $result
-# else
-#  result=`bash compiler_deploy.sh $branchName "" ${initParams[iotdb_git_path]}`
-#  exit_evl $result
-# fi
-# echo "部署项目结束 ..."
-iotdbPath=""
+#result=`bash compiler_deploy.sh "${initParams[branch_name]}" "${initParams[commit_id]}" ${initParams[iotdb_git_path]}`
+#exit_evl $result
 # iotdb工程所在的目录
+iotdbPath=""
 if [ ! -z ${initParams[iotdb_deploy_path]} ];then
   iotdbPath=${initParams[iotdb_deploy_path]}
 else
