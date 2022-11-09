@@ -55,7 +55,7 @@ done
 # 替换和ip地址相关的配置
 for ip in ${confignodeIps[@]}; do
   ssh ${account}@${ip} "sed -i 's/^cn_internal_address.*$/cn_internal_address=${ip}/g' ${confignodeBaseDir}/conf/iotdb-confignode.properties"
-  ssh ${account}@${ip} "sed -i 's/^cn_target_config_nodes.*$/cn_target_config_nodes=${confignodeIps[0]}:${confignodePort}/g' ${confignodeBaseDir}/conf/iotdb-confignode.properties"
+  ssh ${account}@${ip} "sed -i 's/^cn_target_config_node_list.*$/cn_target_config_node_list=${confignodeIps[0]}:${confignodePort}/g' ${confignodeBaseDir}/conf/iotdb-confignode.properties"
 done
 # 数组的长度
 len=${#confignodeIps[*]}
@@ -71,7 +71,7 @@ configNodeIpsStr=${str// /,}
 for ip in ${datanodeIps[@]}; do
   ssh ${account}@${ip} "sed -i 's/^dn_internal_address.*$/dn_internal_address=${ip}/g' ${datanodeBaseDir}/conf/iotdb-datanode.properties"
   ssh ${account}@${ip} "sed -i 's/^dn_rpc_address.*$/dn_rpc_address=${ip}/g' ${datanodeBaseDir}/conf/iotdb-datanode.properties"
-  ssh ${account}@${ip} "sed -i 's/^dn_target_config_nodes.*$/dn_target_config_nodes=${configNodeIpsStr}/g' ${datanodeBaseDir}/conf/iotdb-datanode.properties"
+  ssh ${account}@${ip} "sed -i 's/^dn_target_config_node_list.*$/dn_target_config_node_list=${configNodeIpsStr}/g' ${datanodeBaseDir}/conf/iotdb-datanode.properties"
 done
 function replaceParam(){
   key=$1
@@ -159,7 +159,7 @@ for ip in ${confignodeIps[@]}; do
     ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^$key"
   done
   ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^internal_address"
-  ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^target_config_nodes"
+  ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^target_config_node_list"
   echo "${confignodeBaseDir}/conf/iotdb-common.properties 中的配置"
   for key in ${!iotdbCommonMap[@]}; do
     ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-common.properties | grep ^$key"
