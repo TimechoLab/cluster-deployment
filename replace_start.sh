@@ -15,7 +15,7 @@ softBaseDir=$deployPath/iotdb
 confignodeBaseDir=$softBaseDir
 # datanode配置文件的根目录
 datanodeBaseDir=$softBaseDir
-confignodePort=22277
+confignodePort=10710
 declare -A datanodeEnvMap
 declare -A iotdbDatanodeMap
 declare -A iotdbConfignodeMetricMap
