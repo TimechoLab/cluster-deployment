@@ -1,5 +1,7 @@
 #!/bin/bash
+shopt -s expand_aliases
 alias ssh="ssh -o stricthostkeychecking=no"
+alias scp="scp -o stricthostkeychecking=no"
 confignodeIpsStr=$1
 confignodeIps=(${confignodeIpsStr//,/ })
 echo "当前的confignode ip:"${confignodeIps[1]} ${confignodeIps[2]} ${confignodeIps[0]}

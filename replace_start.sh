@@ -1,5 +1,7 @@
 #!/bin/bash
+shopt -s expand_aliases
 alias ssh="ssh -o stricthostkeychecking=no"
+alias scp="scp -o stricthostkeychecking=no"
 # configNode的ip list
 confignodeIpsStr=$1
 confignodeIps=(${confignodeIpsStr//,/ })

@@ -1,5 +1,7 @@
 #!/bin/bash
+shopt -s expand_aliases
 alias ssh="ssh -o stricthostkeychecking=no"
+alias scp="scp -o stricthostkeychecking=no"
 declare -A initParams
 for line in $(cat config.ini | sed '/^$/d'); do
   # format[xxx]
