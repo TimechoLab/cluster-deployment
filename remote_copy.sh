@@ -45,7 +45,7 @@ for ip in ${datanodeIps[@]};do
   echo "kill DataNode ..."
   closeServer DataNode $ip
   # 删除已有的iotdb目录文件
-  ss ${account}@${ip} "rm -rf ${remoteSoftPath} "
+  ssh ${account}@${ip} "rm -rf ${remoteSoftPath} "
   # 复制新的iotdb到目录中
   scp -rq ${localSoftPath} ${account}@${ip}:${remoteSoftPath}
   ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/datanode/logs > /dev/null 2>&1 &"
