@@ -63,9 +63,9 @@ if [ ! -z ${initParams[iotdb_deploy_path]} ];then
 else
   iotdbPath=${initParams[iotdb_git_path]}/distribution/target/apache-iotdb-*-all-bin/apache-iotdb-*-all-bin/
 fi
-echo "开始复制项目到服务器 ..."
-bash remote_copy.sh $confignodeIpsStr $datanodeIpsStr $deployPath $userNameOfServer $iotdbPath
+echo "开始清理数据目录 ..."
+bash remove_data.sh $confignodeIpsStr $datanodeIpsStr $deployPath $userNameOfServer $iotdbPath
 echo "项目复制到服务器结束 ..."
 echo "开始替换配置并启动服务器 ..."
-bash replace_start.sh $confignodeIpsStr $datanodeIpsStr $deployPath $userNameOfServer
+bash start_cluster.sh $confignodeIpsStr $datanodeIpsStr $deployPath $userNameOfServer
 echo "替换配置并启动服务器结束 ..."
