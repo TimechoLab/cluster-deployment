@@ -1,4 +1,5 @@
 #!/bin/bash
+alias ssh="ssh -o stricthostkeychecking=no"
 # configNode的ip list
 confignodeIpsStr=$1
 confignodeIps=(${confignodeIpsStr//,/ })
@@ -143,52 +144,6 @@ for ip in ${datanodeIps[@]}; do
 done
 echo ”datanode的配置更新完成 ...“
 echo "集群配置已经更新完成 ... "
-echo "-------------输出替换脚本的变量内容开始-------------"
-for ip in ${confignodeIps[@]}; do
-  echo "开始输出ConfigNode[$ip]的配置..."
-  echo "${confignodeBaseDir}/conf/iotdb-confignode-metric.yml 中的配置"
-  for key in ${!iotdbConfignodeMetricMap[@]}; do
-    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode-metric.yml | grep ^$key"
-  done
-  echo "${confignodeBaseDir}/conf/confignode-env.sh 中的配置"
-  for key in ${!confignodeEnvMap[@]}; do
-    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/confignode-env.sh | grep ^$key"
-  done
-  echo "${confignodeBaseDir}/conf/iotdb-confignode.properties 中的配置"
-  for key in ${!iotdbConfignodeMap[@]}; do
-    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^$key"
-  done
-  ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^internal_address"
-  ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-confignode.properties | grep ^target_config_node_list"
-  echo "${confignodeBaseDir}/conf/iotdb-common.properties 中的配置"
-  for key in ${!iotdbCommonMap[@]}; do
-    ssh ${account}@${ip} "cat ${confignodeBaseDir}/conf/iotdb-common.properties | grep ^$key"
-  done
-done
-for ip in ${datanodeIps[@]}; do
-  echo "开始输出DataNode[$ip]的配置..."
-  echo "${datanodeBaseDir}/conf/iotdb-datanode-metric.yml 中的配置"
-  for key in ${!iotdbDatanodeMetricMap[@]}; do
-    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode-metric.yml | grep ^$key"
-  done
-  echo "${datanodeBaseDir}/conf/datanode-env.sh 中的配置"
-  for key in ${!datanodeEnvMap[@]}; do
-    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/datanode-env.sh | grep ^$key"
-  done
-  echo "${datanodeBaseDir}/conf/iotdb-datanode.properties 中的配置"
-  for key in ${!iotdbDatanodeMap[@]}; do
-    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^$key"
-  done
-  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^internal_address"
-  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^rpc_address"
-  ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-datanode.properties | grep ^target_config_nodes"
-  echo "${confignodeBadatanodeBaseDirseDir}/conf/iotdb-common.properties 中的配置"
-  for key in ${!iotdbCommonMap[@]}; do
-    ssh ${account}@${ip} "cat ${datanodeBaseDir}/conf/iotdb-common.properties | grep ^$key"
-  done
-done
-
-echo "-------------输出替换脚本的变量内容结束-------------"
 # 启动集群
 function closeServer(){
   key=$1

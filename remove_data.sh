@@ -25,27 +25,21 @@ function closeServer(){
   ssh ${account}@${ip} "kill -9 $pid"
 }
 for ip in ${confignodeIps[@]};do
-  echo "开始复制到"$ip
+  echo "开始清理"$ip
   # 将服务器的服务停止
   echo "kill ConfigNode ..."
   closeServer ConfigNode $ip
-  # 删除已有的iotdb目录文件
-  ssh ${account}@${ip} "rm -rf ${remoteSoftPath} > /dev/null 2>&1 &"
-  # 复制新的iotdb到目录中
-  scp -rq ${localSoftPath} ${account}@${ip}:${remoteSoftPath}
-  ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/confignode/logs > /dev/null 2>&1 &"
-  ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/confignode/data > /dev/null 2>&1 &"
+  echo "remove data and logs ..."
+  ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/logs > /dev/null 2>&1 &"
+  ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/data > /dev/null 2>&1 &"
   # echo "configNode已经复制到"${deployPath}"中,"当前的目录结构为$dir
 done
 for ip in ${datanodeIps[@]};do
-  echo "开始复制到"$ip
+  echo "开始清理"$ip
   # 将服务器的服务停止
   echo "kill DataNode ..."
   closeServer DataNode $ip
-  # 删除已有的iotdb目录文件
-  ssh ${account}@${ip} "rm -rf ${remoteSoftPath} "
-  # 复制新的iotdb到目录中
-  scp -rq ${localSoftPath} ${account}@${ip}:${remoteSoftPath}
-  ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/datanode/logs > /dev/null 2>&1 &"
-  ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/datanode/data > /dev/null 2>&1 &"
+  echo "remove data and logs ..."
+  ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/logs > /dev/null 2>&1 &"
+  ssh ${account}@${ip} "rm -rf ${remoteSoftPath}/data > /dev/null 2>&1 &"
 done
